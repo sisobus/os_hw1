@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <time.h>
 /*
  * command menu
  * 0, 1, ..., 53
@@ -67,8 +68,14 @@ typedef enum _COMMAND_MENU {
     BITMAP_SCAN,
     BITMAP_SCAN_AND_FLIP,
     BITMAP_DUMP,
-    BITMAP_EXPAND
+    BITMAP_EXPAND,
+    NOT_FOUND
 } COMMAND_MENU;
+/*
+ * command argument string list
+ * total 46
+ */
+char command_argument[46][256]={"list_insert","list_splice","list_push","list_push_front","list_push_back","list_remove","list_pop_front","list_pop_back","list_front","list_back","list_size","list_empty","list_reverse","list_sort","list_insert_ordered","list_unique","list_max","list_min","list_swap","list_shuffle","hash_insert","hash_replace","hash_find","hash_delete","hash_clear","hash_size","hash_empty","hash_apply","hash_int_2","bitmap_size","bitmap_set","bitmap_mark","bitmap_reset","bitmap_flip","bitmap_test","bitmap_set_all","bitmap_set_multiple","bitmap_count","bitmap_contains","bitmap_any","bitmap_none","bitmap_all","bitmap_scan","bitmap_scan_and_flip","bitmap_dump","bitmap_expand"};
 
 /*
  * ERROR_NUMBER
@@ -84,7 +91,9 @@ typedef enum _ERROR_NUMBER {
     LIST_RANGE_EXCEED,
     HASH_IS_FULL,
     HASH_IS_NOT_EXISTS,
-    BITMAP_IS_NOT_EXISTS
+    BITMAP_IS_NOT_EXISTS,
+    NUMBER_OF_ARGUMENT_ERROR,
+    DELETE_ERROR_NOT_EXISTS
 } ERROR_NUMBER;
 
 /*
@@ -100,6 +109,10 @@ typedef enum _ERROR_NUMBER {
 #define MAX_HASH_SIZE 10
 #define MAX_BITMAP_SIZE 10
 #define MAX_STRUCT_NAME_SIZE 128
+#define MAX_BUFFER_SIZE 1024
+#define NUMBER_OF_COMMAND_ARGUMENT 46
+#define init_tok(buf) strtok(buf," ")
+#define next_tok() strtok(NULL," ")
 /*
  * custom structure
  */
@@ -139,21 +152,28 @@ bool list_less_function(const struct list_elem *a,const struct list_elem *b,void
  */
 void help();
 void print_error_message(ERROR_NUMBER e);
+int get_argument_count(char *buf);
 COMMAND_MENU get_command(char *buf);
 
 List *get_list(char *buf);
 Hash *get_hash(char *buf);
 Bitmap *get_bitmap(char *buf);
 
+int str2int(char *s) {
+    int ret;
+    sscanf(s,"%d",&ret);
+    return ret;
+}
+
 /*
  * test function
  */
-ERROR_NUMBER test_create_list(char *buf);
-ERROR_NUMBER test_create_hash(char *buf);
-ERROR_NUMBER test_create_bitmap(char *buf);
-ERROR_NUMBER test_delete(char *buf);
-ERROR_NUMBER test_dumpdata(char *buf);
-ERROR_NUMBER test_quit(char *buf);
+ERROR_NUMBER create_list(char *buf);
+ERROR_NUMBER create_hash(char *buf);
+ERROR_NUMBER create_bitmap(char *buf);
+ERROR_NUMBER struct_delete(char *buf);
+ERROR_NUMBER dumpdata(char *buf);
+ERROR_NUMBER quit(char *buf);
 ERROR_NUMBER test_list_insert(char* buf);
 ERROR_NUMBER test_list_splice(char* buf);
 ERROR_NUMBER test_list_push(char* buf);
@@ -201,3 +221,8 @@ ERROR_NUMBER test_bitmap_scan_and_flip(char* buf);
 ERROR_NUMBER test_bitmap_dump(char* buf);
 ERROR_NUMBER test_bitmap_expand(char* buf);
 
+/*
+ * 아쉬운 점
+ * command argument 의 개수를 반영하면
+ * 더욱 안정적인 프로그램이 될텐데 커맨드가 너무 많아서 패쓰
+ */
