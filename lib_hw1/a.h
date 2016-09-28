@@ -1,20 +1,14 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
-#include <assert.h>
-
 /*
  * pintos data structure header
  */
 #include "bitmap.h"
 #include "hash.h"
-#include "debug.h"
-#include "limits.h"
 #include "list.h"
-#include "round.h"
-#include "stdio.c"
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <limits.h>
 /*
  * command menu
  * 0, 1, ..., 53
@@ -102,9 +96,9 @@ typedef enum _ERROR_NUMBER {
 #ifndef true
 #define !(false)
 #endif
-#define MAX_LIST_SIZE 11
-#define MAX_HASH_SIZE 11
-#define MAX_BITMAP_SIZE 11
+#define MAX_LIST_SIZE 10
+#define MAX_HASH_SIZE 10
+#define MAX_BITMAP_SIZE 10
 #define MAX_STRUCT_NAME_SIZE 128
 /*
  * custom structure
@@ -112,24 +106,54 @@ typedef enum _ERROR_NUMBER {
 typedef struct _List {
     struct list list;
     char name[MAX_STRUCT_NAME_SIZE];
-} List lists[MAX_LIST_SIZE];
+} List;
 typedef struct _Hash {
     struct hash hash;
     char name[MAX_STRUCT_NAME_SIZE];
-} Hash hashs[MAX_HASH_SIZE];
+} Hash;
 typedef struct _Bitmap {
     struct bitmap *bitmap;
     char name[MAX_STRUCT_NAME_SIZE];
-} Bitmap bitmaps[MAX_BITMAP_SIZE];
+} Bitmap;
+List lists[MAX_STRUCT_NAME_SIZE];
+Hash hashs[MAX_STRUCT_NAME_SIZE];
+Bitmap bitmaps[MAX_STRUCT_NAME_SIZE];
+typedef struct _List_struct {
+    struct list_elem elem;
+    int value;
+} List_struct;
+typedef struct _Hash_struct {
+    struct hash_elem hash_elem;
+    int value;
+} Hash_struct;
 
 
 /*
+ * custom hash function
+ */
+unsigned hash_hash_function(const struct hash_elem *p,void *aux) ;
+bool hash_less_function(const struct hash_elem *a,const struct hash_elem *b,void *aux);
+bool list_less_function(const struct list_elem *a,const struct list_elem *b,void *aux);
+/*
  * custom function
  */
+void help();
+void print_error_message(ERROR_NUMBER e);
+COMMAND_MENU get_command(char *buf);
+
+List *get_list(char *buf);
+Hash *get_hash(char *buf);
+Bitmap *get_bitmap(char *buf);
 
 /*
  * test function
  */
+ERROR_NUMBER test_create_list(char *buf);
+ERROR_NUMBER test_create_hash(char *buf);
+ERROR_NUMBER test_create_bitmap(char *buf);
+ERROR_NUMBER test_delete(char *buf);
+ERROR_NUMBER test_dumpdata(char *buf);
+ERROR_NUMBER test_quit(char *buf);
 ERROR_NUMBER test_list_insert(char* buf);
 ERROR_NUMBER test_list_splice(char* buf);
 ERROR_NUMBER test_list_push(char* buf);
